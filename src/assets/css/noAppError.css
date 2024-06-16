@@ -1,0 +1,64 @@
+html {
+    height: 100%;
+}
+
+.noAppErrorMessage {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.noAppErrorMessage .noAppErrorMessagePanel {
+    width: 600px;
+    border: 1px solid #450c36;
+    display: flex;
+    flex-direction: column;
+}
+
+.noAppErrorMessage .noAppErrorMessagePanel code {
+    background-color: grey;
+    color: #000000;
+    border-radius: 4px;
+    padding: 4px 4px;
+    font-weight: normal;
+    font-family: inherit;
+}
+
+.noAppErrorMessage .noAppErrorMessagePanel h1 {
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #450c36;
+    padding: 10px 20px;
+    margin: 0px;
+}
+
+.noAppErrorMessage .noAppErrorMessagePanel p {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 20px;
+    text-align: center;
+}
+
+.noAppErrorMessage .noAppErrorMessagePanel ol {
+    list-style: decimal inside;
+    margin: 0px 40px 40px 40px;
+    line-height: 30px;
+}
+
+.noAppErrorMessage .noAppErrorMessagePanel a {
+    text-decoration: none;
+    color: #d4099e;
+}
+
+.noAppErrorMessage .noAppErrorMessagePanel a:hover {
+    text-decoration: underline;
+}

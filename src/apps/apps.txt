@@ -1,0 +1,1 @@
+applications go here. please use 'node create' in your terminal to add applications, components, and pages.

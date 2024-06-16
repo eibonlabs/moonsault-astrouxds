@@ -1,0 +1,64 @@
+:root {
+    /* var(--color-palette-brightblue-900) */
+    --main-bg-color: #101923;
+}
+
+html,
+body {
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    font-family: sans-serif;
+    font-size: 14px;
+    background-color: var(--main-bg-color);
+}
+
+body._TEMPLATE_ {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+._TEMPLATE_ #page {
+    padding: 0px 20px;
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    background-color: var(--main-bg-color);
+    color: #ffffff;
+}
+
+._TEMPLATE_ #page>:first-child {
+    width: 100%;
+}
+
+/* transition away from a page */
+@keyframes out {
+    0% {
+        opacity: 100%;
+    }
+
+    100% {
+        opacity: 0%
+    }
+}
+
+._TEMPLATE_ #page[data-transition="out"] {
+    animation: out 0.25s forwards;
+}
+
+/* transition into a page */
+@keyframes in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1
+    }
+}
+
+._TEMPLATE_ #page[data-transition="in"] {
+    animation: in 0.25s forwards;
+}

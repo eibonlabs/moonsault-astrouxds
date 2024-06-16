@@ -1,0 +1,8 @@
+.DS_Store
+node_modules
+npm_cache
+public
+
+out/
+
+TestApp

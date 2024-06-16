@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: moonsault.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: moonsault.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+import { startRouter } from './router.js';
+import { buildTemplateNodes, buildStyleNodes, loadScript } from './parser.js';
+import { generateRandomValue } from './utils.js';
+
+/**
+ * @description moonsault object contains referencs to currently loaded components so they can be accessed throughout the system.
+ * @param currentApp {string} The app that moonsault is set to load.
+ * @param currentAppPath {string} The path of the app that moonsault is set to load.
+ * @param language {string} The language key that should be used when localizing data.
+ * @param localization {object} A set of key value pairs uses for localization. Split up by language key.
+ * @param staticComponents {object} Components loaded by moonsault that are outside of the #page element.
+ * @param pageComponents {object} Components that are available in the currently loaded page.
+ */
+window.moonsault = {
+    config: null,
+    currentApp: null,
+    currentAppPath: null,
+    language: null,
+    localization: null,
+    staticComponents: {},
+    pageComponents: {},
+    routes: null
+};
+
+/**
+ * @description Sets the current language for localization. If no language code is passed in, then use the lang attribute in the html tag.
+ * @function setLanguage
+ * @param lang {string} The language to use.
+ */
+const setLanguage = (languageCode) => {
+    if (languageCode) {
+        moonsault.language = languageCode;
+    } else {
+        moonsault.language = document.querySelector('html').getAttribute('lang');
+    }
+}
+
+/**
+ * @function setComponentNameSpace
+ * @description Stores a web component in memory in a specific location. This method is called by web components from their connectedCallback() method. If an instance of the web component already exists, a unique ID will be defined.
+ * @param componentName {string} The name of the web component to set in the namespace
+ * @param component {object} The web component to store in memory.
+ */
+const setComponentNameSpace = (componentName, component) => {
+    const uID = componentName + '_' + generateRandomValue();
+
+    // check if component id is empty, and then set
+    // the appropriate id
+    if (component.id === '') {
+        // component does not exist in namespace
+        if (moonsault.staticComponents[componentName] === undefined &amp;&amp; moonsault.pageComponents[componentName] === undefined) {
+            component.id = componentName;
+        } else {
+            // component does exist. use unique id
+            component.id = uID;
+        }
+    }
+
+    if (component.parentElement.closest('#page') === null) {
+        // components outside of the page
+        moonsault.staticComponents[component.id] = component;
+    } else {
+        // components inside of the page
+        moonsault.pageComponents[component.id] = component;
+    }
+}
+
+const buildComponent = (componentName, template, style, component) => {
+    buildStyleNodes(style, componentName)
+    buildTemplateNodes(template, component);
+    setComponentNameSpace(componentName, component);
+};
+
+/**
+ * @function setLocalization
+ * @description sets the localization data for the app to use
+ * @param localization {object} object that contains key value pairs of localization data. setup by language.
+ */
+const setLocalization = (localization) => {
+    moonsault.localization = localization;
+}
+
+/**
+ * @function setCurrentApp
+ * @description sets the current application that is being loaded by moonsault
+ */
+const setCurrentApp = () => {
+    moonsault.currentApp = document.querySelector('body').getAttribute('data-app');
+};
+
+/**
+ * @function setCurrentAppPath
+ * @description sets the path of current application that is being loaded by moonsault
+ */
+const setCurrentAppPath = () => {
+    moonsault.currentAppPath = window.origin + '/apps/' + moonsault.currentApp + '/';
+};
+
+/**
+ * @function setRoutes
+ * @description sets the routes for the current application
+ */
+const setRoutes = (routes) => {
+    moonsault.routes = routes;
+    startRouter();
+};
+
+/**
+ * @function setConfig
+ * @description sets the config for the current application
+ */
+const setConfig = (config) => {
+    moonsault.config = config;
+};
+
+/**
+ * @function setConfig
+ * @description sets up the application
+ * @param appSettings {object} - passed in from the application's index.js file. sets the initial configuraitgon file, localization, default template, and routes.
+ */
+const setupApp = (appSettings) => {
+    setConfig(appSettings.config);
+    setLocalization(appSettings.localization);
+    buildTemplateNodes(appSettings.layout, document.querySelector('body'));
+    setRoutes(appSettings.routes);
+};
+
+const setAppStyle = () => {
+    const style = document.createElement('link');
+    style.setAttribute('rel', 'stylesheet');
+    style.setAttribute('id', moonsault.currentApp);
+    style.setAttribute('href', `${moonsault.currentAppPath}assets/css/app.css`);
+    document.querySelector('head').appendChild(style);
+}
+
+const start = (() => {
+    if (document.querySelector('body').getAttribute('data-app') !== null) {
+        setCurrentApp();
+        setCurrentAppPath();
+        setLanguage();
+        setAppStyle();
+        // dynamically load app based on the currentApp value
+        loadScript(`${moonsault.currentAppPath}app.js`, 'module');
+    } else {
+        buildTemplateNodes(`
+            &lt;div class="noAppErrorMessage">
+                &lt;div class="noAppErrorMessagePanel">
+                    &lt;h1>Uh, oh!&lt;/h1>
+                    &lt;p>It looks like you haven't created an application yet!&lt;/p>
+                    &lt;ol>
+                        &lt;li>In your terminal, run &lt;code>node create&lt;/code> to start the moonsault create app.&lt;/li>
+                        &lt;li>Select &lt;code>1. Create an application&lt;/code>, and then press &lt;code>Enter&lt;/code>&lt;/li>
+                        &lt;li>Enter a name for your application and press &lt;code>Enter&lt;/code>.&lt;/li>
+                        &lt;li>Select &lt;code>5. Quit&lt;/code> and press &lt;code>Enter&lt;/code>.&lt;/li>
+                        &lt;li>In your browser, navigate to &lt;a href="http://localhost:8080">http://localhost:8080&lt;/a>&lt;/li>
+                    &lt;/ol>
+                &lt;/div>
+            &lt;/div>`, document.querySelector('body'));
+    }
+})();
+
+export {
+    setupApp,
+    buildComponent,
+    setComponentNameSpace,
+    generateRandomValue
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#bind">bind</a></li><li><a href="global.html#buildStyleNodes">buildStyleNodes</a></li><li><a href="global.html#buildTemplateNodes">buildTemplateNodes</a></li><li><a href="global.html#generateRandomValue">generateRandomValue</a></li><li><a href="global.html#loadScript">loadScript</a></li><li><a href="global.html#localize">localize</a></li><li><a href="global.html#setComponentNameSpace">setComponentNameSpace</a></li><li><a href="global.html#setConfig">setConfig</a></li><li><a href="global.html#setCurrentApp">setCurrentApp</a></li><li><a href="global.html#setCurrentAppPath">setCurrentAppPath</a></li><li><a href="global.html#setLanguage">setLanguage</a></li><li><a href="global.html#setLocalization">setLocalization</a></li><li><a href="global.html#setRoutes">setRoutes</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Feb 28 2024 14:36:28 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
