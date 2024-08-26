@@ -1,5 +1,13 @@
 # Changelog
 
+## v.1.3.1
+
+- fix bug with moonsault.currentAppPath having an extra forward slash
+- check if file exists before copying (build.js)
+- add example component that requests plain html and css files for use within compoents and pages
+- add support for copying index.html and index.css from components and pages
+- update express version
+
 ## v.1.3.0
 
 - move buildComponent() to connectedCallback(). this fixes an issue with dynamically injecting child components.
