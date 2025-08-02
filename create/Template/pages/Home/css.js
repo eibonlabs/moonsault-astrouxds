@@ -3,8 +3,8 @@ const css = `
   }
   
   p-home h1 {
-    font-size:20px;
-    margin-bottom:20px;
+    font-size: 20px;
+    margin-bottom: 20px;
   }
 `;
 

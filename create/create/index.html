@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>moonsault</title>
+    <meta name="description"
+        content="A super lightweight framework for building applications with native web components.">
+    <meta name="author" content="EIBON Labs">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <style>
+        html,
+        body {
+            font-family: sans-serif;
+            background: rgb(24, 24, 24);
+            background: linear-gradient(180deg, rgba(24, 24, 24, 1) 0%, rgba(0, 0, 0, 1) 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+
+            font-size: 14px;
+            padding: 10px 20px;
+            margin: 0px;
+            height: calc(100% - 20px);
+        }
+
+        h1 {
+            padding: 10px;
+            margin: 0px;
+            font-size: 42px;
+        }
+
+        h2,
+        h3 {
+            margin: 10px 0px 0px 0px;
+            font-size: 20px;
+
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0px;
+            padding: 0px;
+            display: flex;
+
+            flex-direction: column;
+        }
+
+        li {
+            display: flex;
+
+            margin: 0px;
+            padding: 10px;
+            border-bottom: 1px solid rgba(20, 20, 20, 1);
+        }
+
+        li:first-child {
+            padding-top: 0px;
+        }
+
+        select {
+            margin: 0px;
+            padding: 8px 10px;
+            text-align: center;
+            background: rgb(90, 210, 50);
+            background: linear-gradient(193deg, rgba(90, 210, 50, 1) 0%, rgba(40, 84, 164, 1) 49%, rgba(1, 6, 8, 1) 100%);
+            border: 0px;
+            color: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition-property: all;
+            transition-duration: 0.15s;
+        }
+
+        select option {
+            color: #000000;
+        }
+
+        select:hover {
+            box-shadow: inset 0px 0px 10px rgba(90, 210, 50, 1),
+                0px 0px 10px rgba(90, 210, 50, 0.5)
+        }
+
+        button {
+            margin: 0px;
+            padding: 8px 10px;
+            background: rgb(238, 22, 179);
+            background: linear-gradient(193deg, rgba(238, 22, 179, 1) 0%, rgba(112, 10, 39, 1) 53%, rgba(39, 10, 128, 1) 100%);
+            border: 0px;
+            color: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition-property: all;
+            transition-duration: 0.20s;
+            justify-content: center;
+        }
+
+        button:hover {
+            box-shadow: inset 0px 0px 10px rgba(238, 22, 179, 1),
+                0px 0px 10px rgba(238, 22, 179, 0.5);
+        }
+
+        #main-container {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        #main-container #left-column {
+            width: 300px;
+        }
+
+        #main-container #right-column {
+            width: 100%;
+        }
+
+        #apps-container {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #apps {
+            display: none;
+        }
+
+        #apps.show {
+            display: flex;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #setDefaultApp {
+            display: none;
+        }
+
+        #setDefaultApp.show {
+            display: flex;
+        }
+
+        #assets-container {
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #assets-container.show {
+            display: flex;
+        }
+
+        #assets-container #assets {
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+        }
+
+        #assets-container .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #preview-container.container {
+
+            height: calc(100% - 20px);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #preview-container.container #preview {
+            width: 100%;
+            height: 100%;
+            border: 0px;
+            border-radius: 8px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>moonsault : create</h1>
+    <div id="main-container">
+        <div id="left-column">
+            <div id="apps-container">
+                
+                <label>
+                    <h2>Select an App</h2>
+                    <select id="apps" name="app-selector"></select>
+                </label>
+                <button id="setDefaultApp">Set Selected App as the Default</button>
+                <button id="createApp">Create a New App</button>
+            </div>
+            <div id="assets-container">
+                <div class="container">
+                    <h3>Components</h3>
+                    <button id="createComponent">Create a New Component</button>
+                    <ul id="components"></ul>
+                </div>
+                <div class="container">
+                    <h3>Pages</h3>
+                    <button id="createPage">Create a New Page</button>
+                    <ul id="pages"></ul>
+                </div>
+            </div>
+        </div>
+        <div id="right-column">
+            <div id="preview-container" class="container">
+                <h3>Preview</h3>
+                <iframe id="preview" src="" title="preview"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        let model = {
+            selectedApp: null
+        };
+
+        const showAssets = () => {
+            document.querySelector('#assets-container').classList.add('show');
+        };
+
+        const hideAssets = () => {
+            document.querySelector('#assets-container').classList.remove('show');
+        };
+
+        const updateAppAssets = () => {
+            if (model.selectedApp !== null) {
+                setPreview();
+                getComponents();
+                getPages();
+                showAssets();
+            } else {
+                hideAssets();
+            }
+
+        };
+
+        const setPreview = () => {
+            document.querySelector('#preview').setAttribute('src', `http://localhost:8080/apps/${model.selectedApp}`);
+        }
+
+        const selectAppHandler = () => {
+            const appsDropdown = document.querySelector('#apps');
+            appsDropdown.addEventListener('change', (e) => {
+                model.selectedApp = e.target.value;
+                updateAppAssets();
+            });
+        };
+
+        const setDefaultApp = async () => {
+            const request = await fetch(`/create/api/${model.selectedApp}/setDefault`, {
+                method: "put",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            const response = await request.json();
+            alert(response.message);
+        };
+
+        const setDefaultAppHandler = () => {
+            const button = document.querySelector('#setDefaultApp');
+            button.addEventListener('click', (e) => {
+                setDefaultApp();
+            });
+        }
+
+        const createApp = async (appName) => {
+            const request = await fetch('/create/api/apps', {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: appName
+                })
+            });
+            const response = await request.json();
+            alert(response.message);
+            if (response.status === 200) {
+                model.selectedApp = response.data;
+                getApps();
+            }
+        };
+
+        const createAppHandler = () => {
+            const button = document.querySelector('#createApp');
+            button.addEventListener('click', (e) => {
+                const appName = prompt('Please enter the name of the application you would like to create');
+                if (appName !== '' && appName !== null) {
+                    createApp(appName);
+                }
+            });
+        };
+
+        const getApps = async () => {
+            const request = await fetch('/create/api/apps');
+            const response = await request.json();
+            const appsDropdown = document.querySelector('#apps');
+            appsDropdown.textContent = '';
+
+            for (const app in response) {
+                console.log(response[app]);
+                const option = document.createElement('option');
+                option.val = response[app];
+                option.textContent = response[app];
+                appsDropdown.appendChild(option);
+            }
+
+
+
+            if (appsDropdown.length === 0) {
+                appsDropdown.classList.remove('show');
+                document.querySelector('#setDefaultApp').classList.remove('show');
+                model.selectedApp = null;
+
+            } else {
+                model.selectedApp = appsDropdown[0].value;
+                appsDropdown.classList.add('show');
+                document.querySelector('#setDefaultApp').classList.add('show');
+                appsDropdown.value = model.selectedApp;
+            }
+
+            console.log(`Selected app is ${model.selectedApp}`);
+            updateAppAssets();
+        };
+
+        const getComponents = async () => {
+            const request = await fetch(`/create/api/${model.selectedApp}/components/`);
+            const response = await request.json();
+            const componentsList = document.querySelector('#components');
+            componentsList.textContent = '';
+            for (const component in response) {
+                const li = document.createElement('li');
+                li.textContent = response[component];
+                componentsList.appendChild(li);
+            }
+        };
+
+        const createComponent = async (componentName) => {
+            const request = await fetch(`/create/api/${model.selectedApp}/components`, {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: componentName
+                })
+            });
+            const response = await request.json();
+            alert(response.message);
+            if (response.status === 200) {
+                getComponents();
+            }
+        };
+
+        const createComponentHandler = () => {
+            const button = document.querySelector('#createComponent');
+            button.addEventListener('click', (e) => {
+                const componentName = prompt('Please enter the name of the component you would like to create');
+                if (componentName !== '' && componentName !== null) {
+                    createComponent(componentName);
+                }
+            });
+        };
+
+        const getPages = async () => {
+            const request = await fetch(`/create/api/${model.selectedApp}/pages/`);
+            const response = await request.json();
+            const pagesList = document.querySelector('#pages');
+            pagesList.textContent = '';
+            for (const page in response) {
+                const li = document.createElement('li');
+                li.textContent = response[page];
+                pagesList.appendChild(li);
+            }
+        };
+
+        const createPage = async (pageName) => {
+            const request = await fetch(`/create/api/${model.selectedApp}/pages`, {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: pageName
+                })
+            });
+            const response = await request.json();
+            alert(response.message);
+            if (response.status === 200) {
+                getPages();
+            }
+        };
+
+        const createPageHandler = () => {
+            const button = document.querySelector('#createPage');
+            button.addEventListener('click', (e) => {
+                const pageName = prompt('Please enter the name of the page you would like to create');
+                if (pageName !== '' && pageName !== null) {
+                    createPage(pageName);
+                }
+            });
+        };
+
+        getApps();
+        selectAppHandler();
+        createAppHandler();
+        setDefaultAppHandler();
+        createComponentHandler();
+        createPageHandler();
+    </script>
+</body>
+
+</html>

@@ -8,9 +8,6 @@ import css from './css.js';
 
 // web component
 customElements.define(componentName, class extends HTMLElement {
-    constructor() {
-        super();
-    }
 
     exampleCallback(value) {
         console.log(`Passed the value to a callback ${value}`);
