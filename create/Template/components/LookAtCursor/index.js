@@ -6,10 +6,6 @@ import css from './css.js';
 
 // web component
 customElements.define(componentName, class extends HTMLElement {
-    constructor() {
-        super();
-    }
-
 
     // connect component
     connectedCallback() {

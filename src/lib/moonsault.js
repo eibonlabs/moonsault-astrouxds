@@ -1,5 +1,5 @@
 
-import { startRouter } from './router.js';
+import { startRouter, buildRoute, setURLParam, deleteURLParam } from './router.js';
 import { buildTemplateNodes, buildStyleNodes, loadScript } from './parser.js';
 import { generateRandomValue } from './utils.js';
 
@@ -21,7 +21,15 @@ window.moonsault = {
     localization: null,
     staticComponents: {},
     pageComponents: {},
-    routes: null
+    routes: null,
+    currentRoute: null,
+    previousRoute: null,
+    urlParams: {
+        params: {},
+        set: setURLParam,
+        delete: deleteURLParam
+    },
+    buildRoute: buildRoute,
 };
 
 /**
@@ -44,6 +52,7 @@ const setLanguage = (languageCode) => {
  * @param component {object} The web component to store in memory.
  */
 const setComponentNameSpace = (componentName, component) => {
+
     const uID = componentName + '_' + generateRandomValue();
 
     // check if component id is empty, and then set
@@ -96,9 +105,18 @@ const setCurrentApp = () => {
  */
 const setCurrentAppPath = () => {
     if (window.location.href.indexOf('apps') === -1) {
-        moonsault.currentAppPath = `${window.location.href.split('/#/')[0]}/apps/${moonsault.currentApp}/`;
-    } else {
-        moonsault.currentAppPath = `${window.location.href.split('/#/')[0]}/`;
+        if (window.location.href.indexOf('/#/') > -1) {
+            moonsault.currentAppPath = `${window.location.href.split('/#/')[0]}/apps/${moonsault.currentApp}/`;
+        } else {
+            moonsault.currentAppPath = window.origin + '/apps/' + moonsault.currentApp + '/';
+        }
+    }  
+    if (window.location.href.indexOf('apps') > -1) {
+        if (window.location.href.indexOf('/#/') > -1) {
+            moonsault.currentAppPath = `${window.location.href.split('/#/')[0]}/`;
+        } else {
+            moonsault.currentAppPath = window.origin + '/apps/' + moonsault.currentApp + '/';
+        }
     }
 
     if (moonsault.electron === true) {
@@ -164,15 +182,9 @@ const start = (() => {
         buildTemplateNodes(`
             <div class="noAppErrorMessage">
                 <div class="noAppErrorMessagePanel">
-                    <h1>Uh, oh!</h1>
-                    <p>It looks like you haven't created an application yet!</p>
-                    <ol>
-                        <li>In your terminal, run <code>node create</code> to start the moonsault create app.</li>
-                        <li>Select <code>1. Create an application</code>, and then press <code>Enter</code></li>
-                        <li>Enter a name for your application and press <code>Enter</code>.</li>
-                        <li>Select <code>5. Quit</code> and press <code>Enter</code>.</li>
-                        <li>In your browser, navigate to <a href="http://localhost:8080">http://localhost:8080</a></li>
-                    </ol>
+                    <h1>😭 Uh, oh!</h1>
+                    <p>It looks like you haven't created an application yet, or no app is set as the default!</p>
+                    <p>Use the <a href="/create">moonsault create</a> app to create a new application or set one as the default.</p>
                 </div>
             </div>`, document.querySelector('body'));
     }

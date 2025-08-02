@@ -60,6 +60,31 @@
         }
     }
 
+    const addRoute = (src, dest, name, appName) => {
+        console.log('UPDATING ROUTE')
+        fsExtra.readFile(`${src}`, function (err, data) {
+            if (err) {
+                console.log('ERROR WITH READING ROUTE FILE');
+                throw err
+            } else {
+                data = data.toString();
+                const importInjectionPoint = data.lastIndexOf('.js');
+                const importString = `import './pages/${name}/index`;
+
+                // add import
+                data = data.slice(0, importInjectionPoint) + `.js';\n${importString}` + data.slice(importInjectionPoint);
+
+                // add route
+                const routeInjectionPoint = data.lastIndexOf("'");
+                const routeString = `'#/${name.toLowerCase()}': 'p-${name.toLowerCase()}`;
+                data = data.slice(0, routeInjectionPoint + 1) + `,\n    ${routeString}` + data.slice(routeInjectionPoint);
+
+                writeFile(`${path.resolve()}${appsDirectory}${appName}/`, `routes.js`, data);
+            }
+        });
+    };
+
+
     const createPage = (appName) => {
         displayLogo();
         console.log(`Please enter the name of the page you would like to create in the ${appName} application, or press ENTER to cancel: `);
@@ -71,11 +96,10 @@
                 if (!fs.existsSync(dest)) {
 
                     processPageFiles(src, dest, name);
+                    addRoute(`${path.resolve()}${appsDirectory}${appName}/routes.js`, `${path.resolve()}${appsDirectory}${appName}/routes.js`, name, appName);
 
                     console.log('');
                     console.log(`Page ${name} created!`);
-                    console.log('');
-                    console.log(`Don't forget to add the page to your application's routes.js file!`);
                     console.log('');
                     console.log('Press enter to continue.');
                     process.stdin.once('data', () => {

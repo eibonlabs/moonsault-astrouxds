@@ -3,8 +3,8 @@ const css = `
   }
   
   p-error h1 {
-    font-size:20px;
-    margin-bottom:20px;
+    font-size: 20px;
+    margin-bottom: 20px;
   }
 `;
 

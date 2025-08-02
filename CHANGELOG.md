@@ -1,5 +1,30 @@
 # Changelog
 
+## v1.3.5
+- added moonsault create GUI
+- update command line app to automatically add new pages into routes.js.
+- update warning message when no apps are set as the default.
+- if only one app available after creating an app, make it the default.
+- fix bug where an application is not displayed when using /apps/ in the url
+- update build to deploy apps when server is running.
+- update build to deploy routes, localization and config when changed when server is running.
+
+## v.1.3.4
+- add wiki docs
+- add PropUpdateExample component. This component shows how to set a property on a web component, and have that trigger a render to update data.
+
+## v.1.3.3
+
+- add moonsault.currentRoute and moonsault.previousRoute properties
+- add moonsault.urlParams.set and moonsault.urlParams.delete for managing URL parameters
+- add moonsault.buildRoute for building paramater list and and navigating to a route
+- add support for data-hash-change property on components.
+
+## v.1.3.2
+
+- modify router to scroll to top of page after loading. this applies to the window, and also the #page element.
+- modify server to not return 403 if requesting JSON, XML, or CSV files from an API directory.
+
 ## v.1.3.1
 
 - fix bug with moonsault.currentAppPath having an extra forward slash

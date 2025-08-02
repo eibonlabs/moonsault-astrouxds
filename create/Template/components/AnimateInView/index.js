@@ -13,10 +13,6 @@ customElements.define(componentName, class extends HTMLElement {
         </c-animate-in-view>
     */
 
-    constructor() {
-        super();
-    }
-
     // connect component
     connectedCallback() {
         console.info('AnimateInView Component Connected');

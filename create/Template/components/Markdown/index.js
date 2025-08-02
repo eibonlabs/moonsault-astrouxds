@@ -7,9 +7,6 @@ import css from './css.js';
 
 // web component
 customElements.define(componentName, class extends HTMLElement {
-    constructor() {
-        super();
-    }
 
     async getMarkdownFile(src) {
         await fetch(src).then(response => {
